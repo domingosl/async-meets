@@ -1,0 +1,5 @@
+.idea
+.parcel-cache
+public
+.env
+node_modules

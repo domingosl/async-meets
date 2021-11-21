@@ -1,0 +1,19 @@
+{
+  "name": "async-meets",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "parcel ./src/create.html ./src/meet.html --dist-dir ./public",
+    "build": "parcel build ./src/create.html ./src/meet.html --dist-dir ./public"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.0.1",
+    "parcel": "^2.0.1"
+  },
+  "dependencies": {
+    "@loomhq/loom-embed": "^1.2.8",
+    "@loomhq/loom-sdk": "^2.21.2"
+  }
+}
