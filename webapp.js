@@ -10,7 +10,7 @@ const webapp = express();
 webapp.disable('x-powered-by');
 
 webapp.use(compression());
-webapp.use(helmet());
+webapp.use(helmet({ contentSecurityPolicy: false }));
 
 webapp.use(express.static('./public'));
 
