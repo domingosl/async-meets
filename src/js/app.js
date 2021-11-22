@@ -54,7 +54,7 @@ angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '
 
     }
 
-    const API_KEY = "edfc80a1-b935-4de2-864a-fda87b4c60c4";
+    const API_KEY = "f8fa0a15-7bf2-4553-8bdb-13f6588d95f3";
     const BUTTON_ID = "record-btn";
 
     function insertEmbedPlayer(html) {
