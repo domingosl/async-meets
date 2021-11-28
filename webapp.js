@@ -18,6 +18,10 @@ webapp.get('/meet', (req, res) => {
     res.sendFile(path.join(__dirname, './public/meet.html'));
 });
 
-webapp.listen(8080, () => {
+webapp.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
+
+webapp.listen(process.env.WEBAPP_PORT, () => {
     console.log('Webapp ready!');
 });

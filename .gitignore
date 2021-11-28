@@ -1,5 +1,8 @@
 .idea
 .parcel-cache
-public
+public/*
+!public/animated-icons
 .env
 node_modules
+application-state.json
+logs

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AsyncMeets</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
+          integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link href="https://cdn.lineicons.com/3.0/lineicons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="./scss/main.scss"/>
+    <link rel="stylesheet" href="./scss/index.scss"/>
+
+    <script type="module" src="./js/index.js"></script>
+    <script type="module" src="./js/services/modal.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-animate/1.8.2/angular-animate.min.js"
+            integrity="sha512-jZoujmRqSbKvkVDG+hf84/X11/j5TVxwBrcQSKp1W+A/fMxmYzOAVw+YaOf3tWzG/SjEAbam7KqHMORlsdF/eA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body id="app" ng-controller="main" ng-cloak>
+
+<img alt="logo" src="img/logo.png" class="logo"/>
+
+<div ng-show="appState==='welcome'" class="slide">
+
+    <div class="background background1"></div>
+
+    <div class="container">
+        <h1>Asynchronous meetings</h1>
+        <p>Help your team work more efficiently and give individuals flexibility to get their best work done, and why
+            not? have some fun!</p>
+
+        <div class="navigation-hor">
+            <button class="continue" ng-click="setAppState('organizer')">Create an AsyncMeeting</button>
+        </div>
+    </div>
+
+</div>
+
+
+<div ng-show="appState==='organizer'" class="slide">
+    <div class="container">
+        <h1>The organizer</h1>
+        <label>
+            Your Name
+            <input type="text" ng-model="meeting.organizer.name" name="organizerName" placeholder="John Smith"
+                   ng-required="true" maxlength="128" minlength="2">
+        </label>
+        <label>
+            Your Email
+            <input type="email" ng-model="meeting.organizer.email" name="organizerEmail" placeholder="john@email.com">
+        </label>
+        <div class="navigation-hor">
+            <button class="back" ng-click="setAppState('welcome')"><i class="lni lni-arrow-left"></i></button>
+            <button class="continue" ng-click="setAppState('meeting')">Continue</button>
+        </div>
+    </div>
+</div>
+
+<div ng-show="appState==='meeting'" class="slide">
+    <div class="container">
+        <h1>The meeting</h1>
+
+        <label>
+            Discussion point
+            <input type="text" ng-model="meeting.discussionPoint" name="discussionPoint"
+                   placeholder="Ex. General update on your activities" maxlength="300">
+        </label>
+
+        <label>
+            Presenter time
+            <br/>
+            <br/>
+            <br/>
+
+
+            <label class="radio-label">30 seconds
+                <input type="radio" name="presenterTime30" ng-model="meeting.presenterTime" ng-value="30">
+                <span class="checkmark"></span>
+            </label>
+            <label class="radio-label">1 minute
+                <input type="radio" name="presenterTime60" ng-model="meeting.presenterTime" ng-value="60">
+                <span class="checkmark"></span>
+            </label>
+            <label class="radio-label">2 minutes
+                <input type="radio" name="presenterTime120" ng-model="meeting.presenterTime" ng-value="120">
+                <span class="checkmark"></span>
+            </label>
+            <label class="radio-label">5 minutes
+                <input type="radio" name="presenterTime300" ng-model="meeting.presenterTime" ng-value="300">
+                <span class="checkmark"></span>
+            </label>
+
+        </label>
+
+        <div class="navigation-hor">
+            <button class="back" ng-click="setAppState('organizer')"><i class="lni lni-arrow-left"></i></button>
+            <button class="continue" ng-click="setAppState('challenge')">Continue</button>
+        </div>
+    </div>
+</div>
+
+<div ng-show="appState==='challenge'" class="slide">
+    <div class="container">
+        <h1>The challenge</h1>
+
+        <label>
+            <div ng-repeat="challenge in challenges" class="icon-display" ng-click="selectChallenge(challenge._id)"
+                 ng-class="{ 'selected': meeting.challengeId === challenge._id }">
+                <lottie-player ng-src="{{'/animated-icons/' + challenge.name + '.json'}}" mode="bounce"
+                               background="transparent" speed="1" style="width: 80px; height: 110px;" hover
+                               loop></lottie-player>
+                <span>{{challenge.name.toUpperCase()}}</span>
+            </div>
+        </label>
+
+        <div class="challenge-description">
+            <span>{{challengeDescription}}</span>
+        </div>
+
+        <div class="navigation-hor">
+            <button class="back" ng-click="setAppState('meeting')"><i class="lni lni-arrow-left"></i></button>
+            <button class="continue" ng-click="setAppState('attendees')">Continue</button>
+        </div>
+    </div>
+</div>
+
+<div ng-show="appState==='attendees'" class="slide">
+    <div class="container">
+        <h1>The attendees</h1>
+
+        <div ng-repeat="attendee in meeting.attendees">
+            <div class="row">
+                <div class="col-4 padding-right-10">
+                    <input type="text" ng-model="meeting.attendees[$index].name" placeholder="name" maxlength="128">
+                </div>
+                <div class="col-7 padding-right-10">
+                    <input type="email" ng-model="meeting.attendees[$index].email" placeholder="email" maxlength="128">
+                </div>
+                <div class="col-1">
+                    <button ng-if="$index !== 0" class="remove" ng-click="removeAttendee($index)">x</button>
+                </div>
+            </div>
+
+
+        </div>
+
+        <button ng-show="meeting.attendees.length < 4" class="add" ng-click="addNewAttendee()">+ Add attendee</button>
+
+        <div class="navigation-hor">
+            <button class="back" ng-click="setAppState('challenge')"><i class="lni lni-arrow-left"></i></button>
+            <button class="continue" ng-click="setAppState('confirm')">Continue</button>
+        </div>
+
+    </div>
+</div>
+
+<div ng-show="appState==='confirm'" class="slide">
+    <div class="container">
+        <h1>Your AsyncMeet</h1>
+
+        <p>Discussion point: <span class="important-text">{{meeting.discussionPoint}}</span></p>
+        <p>Presentation time: <span class="important-text">{{meeting.presenterTime | time}}</span></p>
+        <p ng-if="meeting.challengeId">The challenge <span class="important-text">{{challengeDescription}}</span></p>
+        <p>Attendees: <span class="attendee-pill" ng-repeat="attendee in meeting.attendees">{{attendee.email}}</span>
+        </p>
+        <p>Organized by: <span class="important-text">{{meeting.organizer.name}}</span></p>
+
+        <div class="navigation-hor">
+            <button class="back" ng-click="setAppState('attendees')"><i class="lni lni-arrow-left"></i></button>
+            <button class="continue" ng-click="confirm()">Confirm and send invitations</button>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="footer">
+    AsyncMeets is a project created for the
+    <a href="https://loomsdkholidayhack2021.devpost.com/" target="_blank">LoomSDK Holiday Hack</a>,
+    by <a href="https://www.linkedin.com/in/domingolupo/" target="_blank">Domingo Lupo</a>
+</div>
+
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+</body>
+</html>
