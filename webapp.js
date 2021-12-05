@@ -17,8 +17,14 @@ webapp.use(express.static('./public'));
 
 webapp.get('/meet/:meetId/attendee/:attendeeId', (req, res) => {
     //TODO: USE EJS
-    const file = fs.readFileSync(path.join(__dirname, './public/meet.html'), { encoding:'utf8' });
+    const file = fs.readFileSync(path.join(__dirname, './public/attendee.html'), { encoding:'utf8' });
     res.send(file.replace('{{meetId}}', req.params.meetId).replace('{{attendeeId}}', req.params.attendeeId));
+});
+
+webapp.get('/meet/:meetId', (req, res) => {
+    //TODO: USE EJS
+    const file = fs.readFileSync(path.join(__dirname, './public/meet.html'), { encoding:'utf8' });
+    res.send(file.replace('{{meetId}}', req.params.meetId));
 });
 
 webapp.get('/', (req, res) => {

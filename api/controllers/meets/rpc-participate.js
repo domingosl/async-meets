@@ -3,6 +3,7 @@ const validator = require('validator');
 const Meets = require('../../models/meets');
 
 const routeController = require('../../services/route-controller');
+const Mailer = require("../../services/mailer");
 
 module.exports = routeController('rpcParticipate', async (req, res) => {
 
@@ -28,5 +29,25 @@ module.exports = routeController('rpcParticipate', async (req, res) => {
 
    res.resolve();
 
+   //TODO: Move this to worker
+   const recentMeet = await Meets.findOne( { _id: meet._id }).lean();
+   const attendeesWithVideos = recentMeet.attendees.reduce((acum, attendee) => acum + (attendee.video.embedUrl ? 1 : 0), 0);
+
+   if(attendeesWithVideos === recentMeet.attendees.length) {
+
+      recentMeet.attendees.concat({ name: meet.organizer.name, email: meet.organizer.email }).map(async attendee => {
+
+         const mailer = new Mailer();
+         await mailer
+             .setTemplate(3)
+             .to(attendee.name, attendee.email)
+             .setParams({
+                discussionPoint: meet.discussionPoint,
+                meetLink: process.env.WEBAPP_URL + '/meet/' + meet._id })
+             .send();
+
+      });
+
+   }
 
 });

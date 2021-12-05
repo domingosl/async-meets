@@ -1,0 +1,31 @@
+.matrix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+
+  .row {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .col {
+    padding: 10px;
+  }
+
+}
+.presenter-name {
+  text-align: center;
+  margin: 15px 0;
+  font-size: 20px;
+}
+
+.waiting-video {
+  background-color: #232529;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}

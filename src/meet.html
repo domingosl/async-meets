@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" ng-app="app">
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Async Meets</title>
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>AsyncMeets</title>
+    <link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="./img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
           integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
@@ -13,101 +13,40 @@
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
     />
+    <link href="https://cdn.lineicons.com/3.0/lineicons.css" rel="stylesheet">
+
     <link rel="stylesheet" href="./scss/main.scss"/>
+    <link rel="stylesheet" href="./scss/meet.scss"/>
+
     <script type="module" src="./js/meet.js"></script>
     <script type="module" src="./js/services/modal.js"></script>
+
     <script type="text/javascript">
         window.ASYNCMEETS = {
-            meetId: "{{meetId}}",
-            attendeeId: "{{attendeeId}}"
+            meetId: "{{meetId}}"
         };
     </script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-animate/1.8.2/angular-animate.min.js"
             integrity="sha512-jZoujmRqSbKvkVDG+hf84/X11/j5TVxwBrcQSKp1W+A/fMxmYzOAVw+YaOf3tWzG/SjEAbam7KqHMORlsdF/eA=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-
 </head>
 <body id="app" ng-controller="main" ng-cloak>
 
 <img alt="logo" src="img/logo-typo-only.png" class="logo"/>
 
-<div ng-show="appState === 'loading'" class="slide">
-    <div class="container">
-        <h1>Just a sec...</h1>
+<div class="matrix">
+
+    <div class="row" ng-repeat="y in [].constructor(rows) track by $index">
+
+        <div class="col" ng-repeat="x in [].constructor(cols) track by $index"  ng-bind-html="vidHTML[$index * rows + $parent.$index]"></div>
+
     </div>
+
 </div>
 
-<div ng-show="appState === 'welcome'" class="slide">
-    <div class="container">
-        <h1>Hello {{data.attendee.name}}!</h1>
-        <p><span class="important-text">{{data.organizer.name}}</span> has invited you to do an <span
-                class="important-text">AsyncMeeting!</span></p><br/>
-        <p><span class="light-text">If this is your first time, click on <a href="">What is this?</a></span></p>
 
-        <div class="navigation-hor">
-            <button class="continue" ng-click="setAppState('debrief')">Lets do this!</button>
-        </div>
-    </div>
-</div>
-
-<div ng-show="appState === 'debrief'" class="slide">
-    <div class="container">
-        <h1>You'll need to talk about</h1>
-        <p class="important-text">{{data.discussionPoint}}</p>
-        <br />
-        <p>And you'll have <span class="important-text">{{data.presenterTime}} seconds</span> to present</p>
-
-        <div class="navigation-hor">
-            <button class="continue" ng-click="setAppState(data.challenge ? 'challenge' : 'prerecord')">Continue</button>
-        </div>
-    </div>
-</div>
-
-<div ng-show="appState === 'challenge'" class="slide">
-    <div class="container">
-        <p>and this meeting challenge is...</p>
-        <h1 class="animate__bounceIn">{{data.challenge.description}}</h1>
-        <div class="navigation-hor">
-            <button class="continue" ng-click="setAppState('prerecord')">Continue</button>
-        </div>
-    </div>
-</div>
-
-<div ng-show="appState === 'prerecord'" class="slide">
-    <div class="container">
-        <p class="important-text">When you are ready, press the record button</p>
-        <p class="light-text">As always, you don't need slides! and don't worry if you mess it up, you can record it as many times as you want.</p>
-
-        <div class="navigation-hor">
-            <button id="record-btn" class="record">Record</button>
-        </div>
-    </div>
-</div>
-
-<div ng-show="appState === 'recording'" class="slide">
-    <div class="container">
-<!--        <h1>{{data.attendee.name}} is now presenting</h1>
-        <p class="important-text">{{data.discussionPoint}}</p>
-        <br />
-        <br />
-        <p>Time remaining</p>
-        <p class="important-text">{{remainingTime}} seconds</p>
-        <br />
-        <p class="light-text">something went wrong? Go back to the <a href="" ng-click="setAppState('prerecord')">recording step</a></p>-->
-    </div>
-</div>
-
-<div ng-show="appState === 'done'" class="slide">
-    <div class="container">
-        <h1>Thank you!</h1>
-        <p>Your presentation has been submitted, you'll receive an email when all participants presented with a link to
-            the completed meet!</p>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
 <div class="footer">
     AsyncMeets is a project created for the
@@ -116,5 +55,4 @@
 </div>
 
 </body>
-
 </html>

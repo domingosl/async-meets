@@ -4,19 +4,14 @@ const routeController = require('../../services/route-controller');
 
 module.exports = routeController('getMeet', async (req, res) => {
 
-    const meet = await Meets.findOne({ _id: req.params.meetId }).populate('challenge');
+    const meet = await Meets.findOne({ _id: req.params.meetId }).populate('challenge').lean();
 
     if(!meet)
         return res.notFound();
 
-    const attendee = meet.attendees.find(attendee => attendee._id.equals(req.params.attendeeId));
+    //map non sensitive fields
+    meet.attendees = meet.attendees.map(attendee => ({ name: attendee.name, video: attendee.video }));
 
-    if(!attendee)
-        return res.notFound();
-
-    if(attendee.video.shareUrl || attendee.video.embedUrl)
-        return res.forbidden("You already participated in this meeting");
-
-    res.resolve({...meet.getPublicFields(), attendee});
+    res.resolve(meet);
 
 });

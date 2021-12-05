@@ -28,7 +28,7 @@ const MeetSchema = new mongoose.Schema({
         },
         challenge: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Challenge',
+            ref: 'Challenge'
         },
         attendees: [
             {

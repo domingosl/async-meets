@@ -20,6 +20,7 @@ angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '
 
 
     $scope.appState = 'welcome';
+    $scope.backgroundIndex = Math.floor(Math.random() * 3 + 1);
 
     const initFormData = () => {
         $scope.meeting = {

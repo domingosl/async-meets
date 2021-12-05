@@ -6,11 +6,22 @@
   height: 100vh;
 }
 
-.background1 {
-  background-image: url('../img/background1.jpg');
+.background1, .background2, .background3 {
   background-size: cover;
   background-position: center center;
   animation: shrink 60s infinite alternate;
+}
+
+.background1 {
+  background-image: url('../img/background1.jpg');
+}
+
+.background2 {
+  background-image: url('../img/background2.jpg');
+}
+
+.background3 {
+  background-image: url('../img/background3.jpg');
 }
 
 @keyframes shrink {

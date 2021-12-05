@@ -1,186 +1,50 @@
 const loader = require('./modules/blocking-loader');
 
-import {isSupported, setup} from "@loomhq/loom-sdk";
 import {oembed} from "@loomhq/loom-embed";
 
-angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '$interval', '$http', '$compile', 'modal', async function ($scope, $timeout, $interval, $http, $compile, modal) {
+angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '$http', 'modal', '$sce', async function ($scope, $timeout, $http, modal, $sce) {
 
-    $scope.appState = 'loading';
     loader.show();
 
+
     const loadApp = async () => {
+
         loader.hide();
-        $timeout(() => $scope.appState = 'welcome', 0);
+
+        $scope.vidHTML = [];
 
 
-        let timer;
+        $scope.cols = Math.ceil($scope.meet.attendees.length/2);
+        $scope.rows = Math.ceil($scope.meet.attendees.length/$scope.cols);
 
-        const resetTimer = () => {
-            timer && $interval.cancel(timer);
-            $scope.remainingTime = $scope.data.presenterTime;
-        }
+        const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
-        resetTimer();
+        const playerWidth = Math.round(vh / $scope.rows - 100);
+        $scope.meet.attendees.map(async attendee => {
 
-        const refreshTimer = () => {
-            if ($scope.remainingTime > 0)
-                return $scope.remainingTime--;
+            if(attendee.video && attendee.video.sharedUrl) {
+                const videoPlayer = await oembed(attendee.video.sharedUrl, {width: playerWidth});
+                $timeout(() => $scope.vidHTML.push($sce.trustAsHtml("<h1 class='presenter-name'>" + attendee.name + "</h1>" + videoPlayer.html)), 0);
+            }
             else {
-                resetTimer();
-                sdkButton.endRecording();
-            }
-        }
-
-        $scope.setAppState = async state => {
-            $scope.appState = state;
-
-            //if(state === 'prerecord')
-            //    await document.body.requestFullscreen();
-
-            if (state === 'challenge')
-                $timeout(() => {
-                    confetti({origin: {x: 0.1}})
-                }, 600);
-
-        }
-
-        const API_KEY = process.env.LOOM_API_KEY;
-        const BUTTON_ID = "record-btn";
-
-        function insertEmbedPlayer(html) {
-            const target = document.getElementById("target");
-
-            if (target) {
-                target.innerHTML = html;
-            }
-        }
-
-
-        const {supported, error} = await isSupported();
-
-        if (!supported) {
-            console.warn(`Error setting up Loom: ${error}`);
-            return;
-        }
-
-        const getSizes = () => {
-            const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-
-            return {
-                vw: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
-                vh,
-                cameraSize: vh * 0.8
-            }
-        }
-
-        const centerCamera = () => {
-            const sizes = getSizes();
-            sdkButton.moveBubble({x: Math.round(sizes.vw/2 - sizes.cameraSize/2), y: Math.round(sizes.vh/2 - sizes.cameraSize/1.5) });
-        };
-
-        const setLoomUI = () => {
-
-            const mainEl = document.getElementById('loom-sdk-record-overlay-shadow-root-id')
-                .shadowRoot.getElementById('recorder-overlay-id');
-            const camera = mainEl
-                .children[0].children[0].children[0].children[0];
-
-            const controls = mainEl.children[0].children[1].children[0];
-            const sizes = getSizes();
-            camera.style.width = sizes.cameraSize + "px";
-            camera.style.height = sizes.cameraSize + "px";
-            camera.style['border'] = "10px solid #736BF7"
-            centerCamera();
-            controls.style['margin-left'] = - sizes.cameraSize/2 - 100 + "px";
-        }
-
-        const button = document.getElementById(BUTTON_ID);
-
-        const {configureButton} = await setup({
-            apiKey: API_KEY,
-            config: {
-                bubbleResizable: false,
-                insertButtonText: "Send video to " + $scope.data.organizer.name
-            }
-        });
-
-        const sdkButton = configureButton({element: button});
-
-        sdkButton.on("insert-click", async video => {
-
-            loader.show();
-
-            await $http.post(
-                process.env.API_URL + "/meets/" +
-                window.ASYNCMEETS.meetId + "/attendee/" +
-                window.ASYNCMEETS.attendeeId + '/rpc-participate', {
-                    embedUrl: video.embedUrl,
-                    sharedUrl: video.sharedUrl
-                });
-
-            loader.hide();
-            $timeout(() => $scope.setAppState('done'), 0);
-        });
-
-        sdkButton.on('bubble-drag-end', centerCamera );
-
-        let soLoaded = false;
-        $scope.isRecording = false;
-        sdkButton.on("recording-start", async () => {
-            console.log("recording-start!");
-            //await document.body.requestFullscreen();
-            timer = $interval(refreshTimer, 1000);
-
-            try {
-
-                setLoomUI();
-                $scope.isRecording = true;
-
-                if(!soLoaded) {
-                    const tpl = "<div class='super-overlay' ng-if='isRecording'>" +
-                        "<h1>{{data.attendee.name}}</h1>" +
-                        "<h2>{{data.discussionPoint}}</h2>" +
-                        "<h2>Time remaining {{remainingTime}} seconds</h2>" +
-                        "</div>";
-                    const el = $compile(tpl)($scope);
-
-                    angular.element(document.lastElementChild).append(el);
-
-                    window.addEventListener('resize', setLoomUI);
-
-                    soLoaded = true;
-
-                }
-
-
-            } catch (error) {
-                console.log("hack failed", error);
+                $timeout(() =>
+                    $scope
+                        .vidHTML
+                        .push(
+                            $sce
+                                .trustAsHtml("<div class='waiting-video' style='width: " +
+                                    playerWidth + "px; height: " + playerWidth +
+                                    "px'><p>Waiting for <strong>" + attendee.name + "</strong></p></div>")), 0);
             }
 
         });
 
-        sdkButton.on("start", async () => {
-            $timeout(() => $scope.setAppState('recording'), 0);
-            $scope.isRecording = false;
-        });
-
-        sdkButton.on("complete", async video => {
-            resetTimer();
-            $timeout(() => $scope.setAppState('prerecord'), 0);
-            $scope.isRecording = false;
-        });
-
-        sdkButton.on("cancel", async () => {
-            resetTimer();
-            $timeout(() => $scope.setAppState('prerecord'), 0);
-            $scope.isRecording = false;
-        });
     };
 
 
     try {
-        const response = await $http.get(process.env.API_URL + "/meets/" + window.ASYNCMEETS.meetId + "/attendee/" + window.ASYNCMEETS.attendeeId);
-        $scope.data = response.data.data;
+        const response = await $http.get(process.env.API_URL + "/meets/" + window.ASYNCMEETS.meetId);
+        $scope.meet = response.data.data;
         loadApp();
 
     } catch (error) {
@@ -190,11 +54,6 @@ angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '
         }
     }
 
+
+
 }]);
-
-
-
-
-
-
-

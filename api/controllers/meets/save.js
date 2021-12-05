@@ -6,6 +6,9 @@ const routeController = require('../../services/route-controller');
 
 module.exports = routeController('saveMeet', async (req, res) => {
 
+   if(req.body.challenge === "")
+      delete req.body.challenge;
+
    const meet = new Meets(req.body);
 
    await meet.validate();
@@ -19,11 +22,11 @@ module.exports = routeController('saveMeet', async (req, res) => {
    if(oldMeetingsNumber > 6)
       return res.forbidden("You surpassed the max amount of meetings allowed for you profile, please wait before creating a new one");
 
-
    await meet.save();
 
    res.resolve(meet);
 
+   //TODO: Move this to worker
    const mailer = new Mailer();
 
    await mailer
@@ -39,6 +42,7 @@ module.exports = routeController('saveMeet', async (req, res) => {
           .setTemplate(2)
           .to(attendee.name, attendee.email)
           .setParams({
+             attendeeName: attendee.name,
              organizerName: meet.organizer.name,
              discussionPoint: meet.discussionPoint,
              invitationLink: process.env.WEBAPP_URL + '/meet/' + meet._id + '/attendee/' + attendee._id })
