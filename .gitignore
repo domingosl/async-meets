@@ -2,6 +2,7 @@
 .parcel-cache
 public/*
 !public/animated-icons
+!public/favicon.ico
 .env
 node_modules
 application-state.json
