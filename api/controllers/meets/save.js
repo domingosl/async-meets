@@ -1,5 +1,6 @@
 const moment = require('moment');
 const Meets = require('../../models/meets');
+const Mailer = require('../../services/mailer');
 
 const routeController = require('../../services/route-controller');
 
@@ -23,7 +24,26 @@ module.exports = routeController('saveMeet', async (req, res) => {
 
    res.resolve(meet);
 
-   //Send organizer email
-   //Send attendees emails
+   const mailer = new Mailer();
+
+   await mailer
+       .setTemplate(1)
+       .to(meet.organizer.name, meet.organizer.email)
+       .setParams({ meetLink: process.env.WEBAPP_URL + '/meet/' + meet._id })
+       .send();
+
+   meet.attendees.map(async attendee => {
+
+      const mailer = new Mailer();
+      await mailer
+          .setTemplate(2)
+          .to(attendee.name, attendee.email)
+          .setParams({
+             organizerName: meet.organizer.name,
+             discussionPoint: meet.discussionPoint,
+             invitationLink: process.env.WEBAPP_URL + '/meet/' + meet._id + '/attendee/' + attendee._id })
+          .send();
+
+   });
 
 });
