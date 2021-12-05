@@ -108,6 +108,9 @@ async function startAPIServer(db) {
             utilities.notifier.send('API server running!', {env: process.env.ENV}, 'low');
 
 
+        //const mailer = new (require('./api/services/mailer'));
+        //mailer.setTemplate(1).to("dom", "ing.domingo.sl@gmail.com").setParams({ meet_id: "123" }).send();
+
     });
 
 }

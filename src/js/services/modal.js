@@ -11,7 +11,7 @@ angular.module('app').service('modal', function () {
         confirm: message => Swal.fire({
             ...generalConfig,
             title: 'Success!',
-            text: message,
+            html: message,
             icon: 'success',
         }),
         error: message => Swal.fire({
@@ -19,6 +19,15 @@ angular.module('app').service('modal', function () {
             title: 'Oh oh',
             text: message,
             icon: 'error',
+        }),
+        critical: message => Swal.fire({
+            ...generalConfig,
+            title: 'Oh oh',
+            text: message,
+            icon: 'error',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false
         }),
     }
 

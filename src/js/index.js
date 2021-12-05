@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const loader = require('./modules/blocking-loader');
+const {model} = require("mongoose");
 
 const organizerSchema = Joi.object({
     name: Joi.string().min(2).max(120).required().label('Organizer\'s name'),
@@ -15,68 +16,27 @@ const attendeesSchema = Joi.array().items(Joi.object().keys({
     email: Joi.string().email({ tlds: {allow: false} }).required().label('Attendee\'s email')
 })).unique('email');
 
-angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '$interval', 'modal', async function ($scope, $timeout, $interval, modal) {
+angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '$interval', 'modal', '$http', async function ($scope, $timeout, $interval, modal, $http) {
 
-
-    const fakeData = {
-        challenges: [
-            {
-                _id: "0",
-                name: 'pushups',
-                description: "Do the most pushups you can do right after finishing your point"
-            },
-            {
-                _id: "1",
-                name: 'pets',
-                description: "Present while holding your pet"
-            },
-            {
-                _id: "2",
-                name: 'plank',
-                description: "Present while planking"
-            },
-            {
-                _id: "3",
-                name: 'talents',
-                description: "By the end of your presentation you must show your secret talent"
-            },
-            {
-                _id: "4",
-                name: 'foodie',
-                description: "Present while eating a delicious meal"
-            },
-            {
-                _id: "5",
-                name: 'standing',
-                description: "Present while standing up"
-            },
-            {
-                _id: "6",
-                name: 'wow',
-                description: "Share an interesting fact after your presentation"
-            }
-        ]
-
-    };
-
-    //$interval(()=>console.log($scope.forms.main.organizerName.$valid, $scope.forms.main.organizerEmail.$valid), 2000);
-    //modal.confirm("Ciao mondo!");
-
-    $scope.challenges = fakeData.challenges;
 
     $scope.appState = 'welcome';
-    $scope.meeting = {
-        organizer: {
-            name: '',
-            email: ''
-        },
-        presenterTime: 120,
-        discussionPoint: '',
-        challengeId: '',
-        attendees: [
-            {name: '', email: ''}
-        ]
+
+    const initFormData = () => {
+        $scope.meeting = {
+            organizer: {
+                name: '',
+                email: ''
+            },
+            presenterTime: 120,
+            discussionPoint: '',
+            challenge: '',
+            attendees: [
+                {name: '', email: ''}
+            ]
+        };
     };
+
+    initFormData();
 
     $scope.challengeDescription = 'No challenge selected';
 
@@ -84,11 +44,19 @@ angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '
 
     $scope.removeAttendee = index => $scope.meeting.attendees.splice(index, 1);
 
-    $scope.setAppState = async state => {
+    $scope.setAppState = async (state, doNotValidate = false) => {
 
         let validation;
 
         switch ($scope.appState) {
+            case "welcome":
+                if(!$scope.challenges) {
+                    loader.show();
+                    const response = await $http.get(process.env.API_URL + '/challenges');
+                    $timeout(()=>{ $scope.challenges = response.data.data; }, 0);
+                    loader.hide();
+                }
+                break;
             case "organizer":
                 validation = organizerSchema.validate($scope.meeting.organizer);
                 break;
@@ -100,27 +68,51 @@ angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '
                 break;
         }
 
-        if(validation && validation.error) return modal.error(validation.error.details[0].message);
-        $scope.appState = state;
+        if(!doNotValidate && validation && validation.error) return modal.error(validation.error.details[0].message);
+
+        $timeout(()=>$scope.appState = state, 0);
 
     }
 
-    $scope.selectChallenge = challengeId => {
+    $scope.selectChallenge = challenge => {
 
-        if (challengeId === $scope.meeting.challengeId) {
+        if (challenge === $scope.meeting.challenge) {
             $scope.challengeDescription = 'No challenge selected';
-            return $scope.meeting.challengeId = null;
+            return $scope.meeting.challenge = null;
         }
 
-        $scope.meeting.challengeId = challengeId;
-        $scope.challengeDescription = $scope.challenges.find(el => el._id === challengeId).description;
+        $scope.meeting.challenge = challenge;
+        $scope.challengeDescription = $scope.challenges.find(el => el._id === challenge).description;
     }
 
-    $scope.confirm = () => {
+
+    $scope.confirm = async () => {
 
         loader.show();
 
-        console.log({...$scope.meeting, attendees: $scope.meeting.attendees.map(el => ({ name: el.name, email: el.email }))});
+        try {
+            await $http.post(process.env.API_URL + '/meets',
+                {...$scope.meeting, attendees: $scope.meeting.attendees.map(el => ({name: el.name, email: el.email}))});
+
+            $timeout(()=>{
+                initFormData();
+
+                loader.hide();
+
+                modal.confirm("AsyncMeet created! check you email for your meet link.");
+            },0);
+
+            await $scope.setAppState('welcome');
+
+
+        }
+        catch (e) {
+            loader.hide();
+
+            if(e.status === 403) modal.error(e.data.message);
+            else modal.error("Something went wrong, please try again later");
+        }
+
     }
 
 }])

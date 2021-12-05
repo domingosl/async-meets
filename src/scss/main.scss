@@ -203,7 +203,6 @@ a {
 
   button.record {
     font-size: 1.25em;
-    margin-top: 40px;
     padding: 0.6em 1.5em;
     border: 3px solid #232529;
     border-radius: 40px;
@@ -245,5 +244,34 @@ a {
   margin-top: 40px;
   display: flex;
   width: 100%;
+}
+
+.super-overlay {
+
+  position: absolute;
+  z-index: 9999999999;
+  bottom: 140px;
+  left: calc(50% - 170px);
+
+  h1 {
+    font-size: 20px;
+  }
+
+  h2 {
+    font-size: 15px;
+    font-weight: normal;
+  }
+
+  h1, h2 {
+    text-align: center;
+    padding: 5px;
+    background-color: #0000005c;
+    margin: 5px 0;
+    border-radius: 15px;
+    width: 360px;
+    font-weight: 400;
+    text-overflow: ellipsis;
+  }
+
 }
 

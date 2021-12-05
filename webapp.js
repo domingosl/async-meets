@@ -1,11 +1,10 @@
 require('dotenv').config();
 
 const express                   = require('express');
-const cors                      = require('cors');
 const compression               = require('compression');
-const bodyParser                = require('body-parser');
 const helmet                    = require('helmet');
 const path                      = require('path');
+const fs                        = require('fs');
 
 const webapp = express();
 
@@ -16,8 +15,10 @@ webapp.use(helmet({ contentSecurityPolicy: false }));
 
 webapp.use(express.static('./public'));
 
-webapp.get('/meet', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/meet.html'));
+webapp.get('/meet/:meetId/attendee/:attendeeId', (req, res) => {
+    //TODO: USE EJS
+    const file = fs.readFileSync(path.join(__dirname, './public/meet.html'), { encoding:'utf8' });
+    res.send(file.replace('{{meetId}}', req.params.meetId).replace('{{attendeeId}}', req.params.attendeeId));
 });
 
 webapp.get('/', (req, res) => {

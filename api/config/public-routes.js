@@ -1,4 +1,12 @@
 //regex are supported
 module.exports = [
-    '/status'
+    '/status',
+    {
+        url: /\/meets\/.+/gm,
+        methods: ['POST']
+    },
+    {
+        url: '/meets',
+        methods: ['GET']
+    }
 ];

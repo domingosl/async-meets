@@ -58,7 +58,7 @@
             <input type="email" ng-model="meeting.organizer.email" name="organizerEmail" placeholder="john@email.com">
         </label>
         <div class="navigation-hor">
-            <button class="back" ng-click="setAppState('welcome')"><i class="lni lni-arrow-left"></i></button>
+            <button class="back" ng-click="setAppState('welcome', true)"><i class="lni lni-arrow-left"></i></button>
             <button class="continue" ng-click="setAppState('meeting')">Continue</button>
         </div>
     </div>
@@ -101,7 +101,7 @@
         </label>
 
         <div class="navigation-hor">
-            <button class="back" ng-click="setAppState('organizer')"><i class="lni lni-arrow-left"></i></button>
+            <button class="back" ng-click="setAppState('organizer', true)"><i class="lni lni-arrow-left"></i></button>
             <button class="continue" ng-click="setAppState('challenge')">Continue</button>
         </div>
     </div>
@@ -113,11 +113,11 @@
 
         <label>
             <div ng-repeat="challenge in challenges" class="icon-display" ng-click="selectChallenge(challenge._id)"
-                 ng-class="{ 'selected': meeting.challengeId === challenge._id }">
+                 ng-class="{ 'selected': meeting.challenge === challenge._id }">
                 <lottie-player ng-src="{{'/animated-icons/' + challenge.name + '.json'}}" mode="bounce"
                                background="transparent" speed="1" style="width: 80px; height: 110px;" hover
                                loop></lottie-player>
-                <span>{{challenge.name.toUpperCase()}}</span>
+                <span>{{challenge.showName}}</span>
             </div>
         </label>
 
@@ -126,7 +126,7 @@
         </div>
 
         <div class="navigation-hor">
-            <button class="back" ng-click="setAppState('meeting')"><i class="lni lni-arrow-left"></i></button>
+            <button class="back" ng-click="setAppState('meeting', true)"><i class="lni lni-arrow-left"></i></button>
             <button class="continue" ng-click="setAppState('attendees')">Continue</button>
         </div>
     </div>
@@ -155,7 +155,7 @@
         <button ng-show="meeting.attendees.length < 4" class="add" ng-click="addNewAttendee()">+ Add attendee</button>
 
         <div class="navigation-hor">
-            <button class="back" ng-click="setAppState('challenge')"><i class="lni lni-arrow-left"></i></button>
+            <button class="back" ng-click="setAppState('challenge', true)"><i class="lni lni-arrow-left"></i></button>
             <button class="continue" ng-click="setAppState('confirm')">Continue</button>
         </div>
 
@@ -168,13 +168,13 @@
 
         <p>Discussion point: <span class="important-text">{{meeting.discussionPoint}}</span></p>
         <p>Presentation time: <span class="important-text">{{meeting.presenterTime | time}}</span></p>
-        <p ng-if="meeting.challengeId">The challenge <span class="important-text">{{challengeDescription}}</span></p>
+        <p ng-if="meeting.challenge">The challenge <span class="important-text">{{challengeDescription}}</span></p>
         <p>Attendees: <span class="attendee-pill" ng-repeat="attendee in meeting.attendees">{{attendee.email}}</span>
         </p>
         <p>Organized by: <span class="important-text">{{meeting.organizer.name}}</span></p>
 
         <div class="navigation-hor">
-            <button class="back" ng-click="setAppState('attendees')"><i class="lni lni-arrow-left"></i></button>
+            <button class="back" ng-click="setAppState('attendees', true)"><i class="lni lni-arrow-left"></i></button>
             <button class="continue" ng-click="confirm()">Confirm and send invitations</button>
         </div>
 
