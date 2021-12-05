@@ -31,7 +31,7 @@ module.exports = routeController('rpcParticipate', async (req, res) => {
 
    //TODO: Move this to worker
    const recentMeet = await Meets.findOne( { _id: meet._id }).lean();
-   const attendeesWithVideos = recentMeet.attendees.reduce((acum, attendee) => acum + (attendee.video.embedUrl ? 1 : 0), 0);
+   const attendeesWithVideos = recentMeet.attendees.reduce((acum, attendee) => acum + (attendee.video && attendee.video.embedUrl ? 1 : 0), 0);
 
    if(attendeesWithVideos === recentMeet.attendees.length) {
 
