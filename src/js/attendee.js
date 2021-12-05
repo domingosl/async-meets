@@ -173,6 +173,9 @@ angular.module('app', ['ngAnimate']).controller('main', ['$scope', '$timeout', '
         });
     };
 
+    $scope.help = () => {
+        modal.html('<iframe width="400" height="315" src="https://www.youtube.com/embed/Fowz6hW3vPU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>');
+    }
 
     try {
         const response = await $http.get(process.env.API_URL + "/meets/" + window.ASYNCMEETS.meetId + "/attendee/" + window.ASYNCMEETS.attendeeId);

@@ -29,6 +29,10 @@ angular.module('app').service('modal', function () {
             allowEscapeKey: false,
             showConfirmButton: false
         }),
+        html: html => Swal.fire({
+            html,
+            showConfirmButton: false
+        })
     }
 
 });

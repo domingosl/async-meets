@@ -44,7 +44,7 @@
         <h1>Hello {{data.attendee.name}}!</h1>
         <p><span class="important-text">{{data.organizer.name}}</span> has invited you to do an <span
                 class="important-text">AsyncMeeting!</span></p><br/>
-        <p><span class="light-text">If this is your first time, click on <a href="">What is this?</a></span></p>
+        <p><span class="light-text">If this is your first time, click on <a href="" ng-click="help()">What is this?</a></span></p>
 
         <div class="navigation-hor">
             <button class="continue" ng-click="setAppState('debrief')">Lets do this!</button>
